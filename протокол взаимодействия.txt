@@ -1,0 +1,58 @@
+
+
+Протокол взаимодействия модуля V2Server и модуля ShowGraph
+                   Версия 1.0
+
+1.	Назначение документа
+Настоящий протокол определяет структуру и формат данных взаимодействия модуля
+V2Server и модуля ShowGraph по сети .
+2.	 Взаимодействие и формат передаваемой информации
+Модули взаимодействуют передачей информационных пакетов(ИП) UPD.
+2.1	Протокол ИП1. Передается от модуля ShowGraph.  
+       - cmd – char 
+       Cmd == 1 – запрос осциллограммы1
+       
+      Cmd == 3 – запрос сигналов в стробах 
+      Cmd == 4 – сохранить параметры  стробов  в канале
+             - маска стробов  B 000xxxxx ( x = 1 – есть строб 0 – нет)
+              - структура стробов 
+struct strob_struct_t
+{
+     quint16 timeb; // время начала строба мксек
+     quint16 lenth_strob; // длина строба мксек
+     quint8 porog  ; //  0-255  
+};
+Всего 8 каналов
+
+Cmd == 5 – масштаб развертки
+Short Begin_razvert;  //2 байта мксек
+Short Begin_razvert;  //2 байта
+ 
+2.2	Протокол ИП2  . ОТ V2Server
+Ответ на Cmd == 1  осциллограммы1
+             Unsigned char ampl[256];
+Ответ на Cmd == 2  осциллограммы2
+             Unsigned char ampl[256];
+Cmd == 3 – запрос сигналов в стробах 
+#define NUM_CHAN             8    - число каналов
+#define NUM_RESULT_STRBS    5
+
+struct amp_strob_struct_t
+{
+     quint16 time;  // пока не используется
+     quint8 ampl;
+};
+
+struct amp_chan_struct_t
+{
+     amp_strob_struct_t ampl[NUM_RESULT_STRBS];
+};
+
+struct amp_struct_t
+{
+     amp_chan_struct_t ampl_us[NUM_CHAN];
+};
+
+
+p.s такт забываем
+
